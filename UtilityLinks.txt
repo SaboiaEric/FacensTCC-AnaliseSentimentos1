@@ -1,0 +1,5 @@
+Some good links:
+https://developer.twitter.com/en/docs/api-reference-index
+https://developer.twitter.com/en/docs/basics/response-codes
+https://developer.twitter.com/en/docs/basics/rate-limiting
+https://developer.twitter.com/en/docs/basics/rate-limits
