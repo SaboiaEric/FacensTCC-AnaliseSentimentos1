@@ -26,9 +26,9 @@ analysis = None
 tweets = []
 for tweet in public_tweets:
     try:
-        #print(tweet.text)
+        print(tweet.text)
         analysis = tb(tweet.text)
-        #print(analysis.sentiment.polarity)
+        print(analysis.sentiment.polarity)
         #print('MÉDIA DE SENTIMENTO: ' + str(np.mean(analysis.sentiment.polarity)))
         tweets.append(tweet)
     except:
@@ -43,9 +43,9 @@ print("\n\n\n\n")
     #print("\n")
     #print(item.text +"\n")
 
-import datetime
+#import datetime
 
-currentlyTime = str(datetime.datetime.now()).replace(':','_').replace(' ','_').replace('-','_')
-with open(currentlyTime + " - " + "miniDatabase.txt", "w") as output:
-    for tweet in tweets:
-        output.write(str(tweet.id)+ " -- " + tweet.text + "\n")
+#currentlyTime = str(datetime.datetime.now()).replace(':','_').replace(' ','_').replace('-','_')
+#with open(currentlyTime + " - " + "miniDatabase.txt", "w") as output:
+#    for tweet in tweets:
+#        output.write(str(tweet.id)+ " -- " + tweet.text + "\n")
