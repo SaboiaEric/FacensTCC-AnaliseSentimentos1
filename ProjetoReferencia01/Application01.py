@@ -3,6 +3,7 @@ import tweepy
 #Importado numpy para medir a popularidade dos modos
 #Não é necessário que isso seja feito :)
 import numpy as np 
+import datetime
 
 #Let's go to the code :)
 
