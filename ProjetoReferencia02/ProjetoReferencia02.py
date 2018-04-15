@@ -24,6 +24,7 @@ tweets = api.search('Eleicao2018')
 for tweet in tweets:
     frase = tb(tweet.text)
 
+    #Detecta a linguagem e se necessário converte para inglês
     if frase.detect_language() != 'en':
         traducao = tb(str(frase.translate(to='en')))
         print('Tweet: {0} - Sentimento: {1}'.format(tweet.text, traducao.sentiment))
