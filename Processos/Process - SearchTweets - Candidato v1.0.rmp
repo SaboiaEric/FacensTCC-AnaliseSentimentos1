@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="8.1.000">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="8.1.000" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Popular" width="90" x="45" y="34">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="popular"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="until" value="2018.04.01 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel" width="90" x="246" y="34">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsonaro-Popular-DataBase2.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="true" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Recente" width="90" x="45" y="136">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="until" value="2018.06.07 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="true" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (2)" width="90" x="246" y="136">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180607-Bolsonaro-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro2018 Popular" width="90" x="45" y="289">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro2018"/>
+        <parameter key="result_type" value="popular"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="until" value="2018.04.01 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (3)" width="90" x="246" y="289">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsonaro2018-Popular-DataBase2.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro2018 Recente" width="90" x="45" y="391">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro2018"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="until" value="2018.04.01 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (4)" width="90" x="246" y="391">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsonaro2018-Recente-DataBase2.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsomito Popular" width="90" x="45" y="493">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsomito"/>
+        <parameter key="result_type" value="popular"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (5)" width="90" x="246" y="493">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsomito-Popular-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsomito Recente" width="90" x="45" y="595">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsomito"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (6)" width="90" x="246" y="595">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsomito-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsolixo Popular" width="90" x="45" y="697">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsolixo"/>
+        <parameter key="result_type" value="popular"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (7)" width="90" x="246" y="697">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsolixo-Popular-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsolixo Recente" width="90" x="45" y="799">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsolixo"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="20000"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (8)" width="90" x="246" y="799">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180608-Bolsolixo-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Recente (2)" width="90" x="447" y="238">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="until" value="2018.06.09 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (9)" width="90" x="648" y="238">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180609-Bolsonaro-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Recente (3)" width="90" x="447" y="340">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="until" value="2018.06.06 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (10)" width="90" x="648" y="340">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180606-Bolsonaro-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Recente (4)" width="90" x="447" y="442">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="until" value="2018.06.07 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (11)" width="90" x="648" y="442">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180607-Bolsonaro-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <operator activated="false" class="social_media:search_twitter" compatibility="8.1.000" expanded="true" height="68" name="Bolsonaro Recente (5)" width="90" x="447" y="544">
+        <parameter key="connection" value="TwitterEricSaboia"/>
+        <parameter key="query" value="Bolsonaro"/>
+        <parameter key="result_type" value="recent"/>
+        <parameter key="limit" value="6000"/>
+        <parameter key="until" value="2018.06.09 00:21:18 -0300"/>
+        <parameter key="filter_by_geo_location" value="false"/>
+        <parameter key="radius_unit" value="miles"/>
+      </operator>
+      <operator activated="false" class="write_excel" compatibility="8.1.000" expanded="true" height="82" name="Write Excel (12)" width="90" x="648" y="544">
+        <parameter key="excel_file" value="C:\Users\erics\Desktop\DataBases\20180609-Bolsonaro-Recente-DataBase.xlsx"/>
+        <parameter key="file_format" value="xlsx"/>
+        <parameter key="encoding" value="SYSTEM"/>
+        <parameter key="sheet_name" value="RapidMiner Data"/>
+        <parameter key="date_format" value="yyyy-MM-dd HH:mm:ss"/>
+        <parameter key="number_format" value="#.0"/>
+      </operator>
+      <connect from_op="Bolsonaro Recente" from_port="output" to_op="Write Excel (2)" to_port="input"/>
+      <connect from_op="Write Excel (2)" from_port="through" to_port="result 2"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+    </process>
+  </operator>
+</process>
