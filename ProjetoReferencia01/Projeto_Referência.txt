@@ -1,3 +1,0 @@
-Projeto referência:
-https://towardsdatascience.com/twitter-demographics-user-age-inference-82ad7bf65229
-
