@@ -1,10 +1,9 @@
 from sklearn.model_selection import cross_val_score
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.svm import LinearSVC
-from sklearn.multiclass import OneVsOneClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score ,accuracy_score ,confusion_matrix, classification_report
 from collections import Counter
 import pandas as pd
 import numpy as np
@@ -27,17 +26,32 @@ def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
     k = 10
     scores = cross_val_score(modelo, treino_dados, treino_marcacoes, cv=k)
     taxa_de_acerto = np.mean(scores)
-    msg = "Taxa de acerto do {0}: {1}".format(nome, taxa_de_acerto)
+    msg = "ETAPA TREINO - Taxa de acerto do {0}: {1}".format(nome, taxa_de_acerto)
     print(msg)
     return taxa_de_acerto
 
 def teste_real(modelo, validacao_dados, validacao_marcacoes):
     resultado = modelo.predict(validacao_dados)
-    acertos = resultado == validacao_marcacoes
-    total_de_acertos = sum(acertos)
-    total_de_elementos = len(validacao_marcacoes)
-    taxa_de_acerto = 100.0 * total_de_acertos / total_de_elementos
-    msg = "Taxa de acerto do vencedor entre os dois algoritmos no mundo real: {0}".format(taxa_de_acerto)
+    metricas(resultado,validacao_marcacoes)
+
+def metricas(resultado,validacao_marcacoes):
+    #Apresentação do report contendo precision, recall and F-measures
+    if len(set(resultado)) > 2:
+        target_names = ['negativo', 'positivo', 'neutro']
+        #os valores acima estão na ordem correta
+        print(classification_report(validacao_marcacoes, resultado, target_names=target_names))
+    else:
+        target_names = ['negativo', 'positivo']
+        #os valores acima estão na ordem correta
+        print(classification_report(validacao_marcacoes, resultado, target_names=target_names))
+        
+        #Apresentação dos true positive, false positive, true negative e false negative
+        tn, fp, fn, tp = confusion_matrix(validacao_marcacoes, resultado).ravel() 
+        msg = "true positive: {0} - false positive: {1} - true negative: {2} - false negative: {3}".format(str(tn),str(fp),str(fn),str(tp))
+        print(msg)
+
+    #Apresentação da accuracy e resultado final
+    msg = "ETAPA VALIDAÇÃO - Taxa de acerto com dados do mundo real: " + str(accuracy_score(validacao_marcacoes, resultado))
     print(msg)
 
 def processar(tweets, frases):
@@ -51,7 +65,6 @@ def processar(tweets, frases):
 
     #aplica as stop words, isto é, remove os pronomes e etc.
     stopwords = nltk.corpus.stopwords.words('portuguese')
-    print(textosQuebrados)
     
     #aplica steem, isto é, deixa a palavra na forma raiz
     stemmer = nltk.stem.RSLPStemmer();
@@ -104,7 +117,7 @@ def processar(tweets, frases):
     resultados[resultadoOneVsOne] = modeloOneVsOne
     
     # MultinomialNB
-    modeloMultinomial = MultinomialNB()
+    modeloMultinomial = MultinomialNB(alpha=1.0, fit_prior=True)
     resultadoMultinomial = fit_and_predict("MultinomialNB", modeloMultinomial, treino_dados, treino_marcacoes)
     resultados[resultadoMultinomial] = modeloMultinomial
     
@@ -113,15 +126,11 @@ def processar(tweets, frases):
     resultadoAdaBoost = fit_and_predict("AdaBoostClassifier", modeloAdaBoost, treino_dados, treino_marcacoes)
     resultados[resultadoAdaBoost] = modeloAdaBoost
     
-    #Descomentar para printar os resultados
-    #print(resultados) 
-    
     #Verifica qual modelo teve a melhor perfomance
     maximo = max(resultados)
     vencedor = resultados[maximo]
     
-    print("Vencedor: ")
-    print(vencedor)
+    print("Vencedor: " + str(vencedor))
     
     #Aplica o modelo vencedor em um caso do mundo real, utilizando dados nunca vistos
     vencedor.fit(treino_dados, treino_marcacoes)
