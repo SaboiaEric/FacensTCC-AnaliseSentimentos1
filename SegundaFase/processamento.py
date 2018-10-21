@@ -3,6 +3,9 @@ from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score
 from collections import Counter
 import matplotlib.pyplot as plt
@@ -32,15 +35,12 @@ def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
     '''
     resultado = modelo.fit(treino_dados, treino_marcacoes)
     fit_and_predict_score = str(modelo.score(treino_dados, treino_marcacoes))
-    print("ETAPA TREINO - Acurácia: " + fit_and_predict_score)
+    print("ETAPA TREINO "+ nome + "- Acurácia: " + fit_and_predict_score)
     return fit_and_predict_score
 
-def teste_real(modelo, validacao_dados, validacao_marcacoes):
+def valida_dados(modelo, validacao_dados, validacao_marcacoes):
     resultado = modelo.predict(validacao_dados)
     metricas(resultado,validacao_marcacoes)
-
-def revalidacao_treino(modelo, treino_dados, treino_marcacoes):
-    resultado = modelo.predict(treino_dados)
 
 def metricas(resultado,validacao_marcacoes):
     #Apresentação do report contendo precision, recall and F-measures
@@ -105,56 +105,7 @@ def matrix_confusao(validacao_marcacoes, resultado, target_names):
     plt.figure()
     plot_confusion_matrix(cnf_matrix, classes=target_names,title='Matrix de Confusão, sem normalização')
 
-def processar(tweets, frases):
-    #Descomente caso seja primeira vez de execução. Funcionalidaeds de processamento
-    #nltk.download('stopwords')
-    #nltk.download('rslp')
-    #nltk.download('punkt')
-
-    #aplica a tokenização e cria a back of words
-    textosQuebrados = [nltk.tokenize.word_tokenize(frase) for frase in frases]
-
-    #aplica as stop words, isto é, remove os pronomes e etc.
-    stopwords = nltk.corpus.stopwords.words('portuguese')
-    
-    #aplica steem, isto é, deixa a palavra na forma raiz
-    stemmer = nltk.stem.RSLPStemmer();
-    
-    dicionario = set()
-    for lista in textosQuebrados:
-        validas = [stemmer.stem(palavra) for palavra in lista if palavra not in stopwords and len(palavra) > 2]
-        dicionario.update(validas)
-    #print(dicionario)
-
-
-    totalDePalavras = len(dicionario)
-    #print(totalDePalavras)
-    #print(dicionario)
-    tuplas = zip(dicionario, range(totalDePalavras))
-    tradutor = {palavra: indice for palavra, indice in tuplas}
-
-
-    vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosQuebrados]
-    
-    marcas = tweets['Sentimento']
-    
-    X = vetoresDeTexto
-    Y = marcas
-    
-    #Divisão de dados para treino e validação.
-    porcentagem_de_treino = 0.8
-    
-    tamanho_de_treino = int(porcentagem_de_treino * len(Y))
-    tamanho_de_validacao = len(Y) - tamanho_de_treino
-    
-    treino_dados = X[0:tamanho_de_treino]
-    treino_marcacoes = Y[0:tamanho_de_treino]
-    
-    validacao_dados = X[tamanho_de_treino:]
-    validacao_marcacoes = Y[tamanho_de_treino:]
-    
-    
-    
+def cria_modelos(treino_dados, treino_marcacoes):
     resultados = {}
     '''
     # OneVsRestClassifier - LinearSVC
@@ -177,16 +128,138 @@ def processar(tweets, frases):
     resultadoAdaBoost = fit_and_predict("AdaBoostClassifier", modeloAdaBoost, treino_dados, treino_marcacoes)
     resultados[resultadoAdaBoost] = modeloAdaBoost
     
+    modeloDecisionTree = DecisionTreeClassifier(random_state=0)
+    resultadoDecisionTree = fit_and_predict("DecisionTree", modeloDecisionTree, treino_dados, treino_marcacoes)
+    resultados[resultadoDecisionTree] = modeloDecisionTree
+
+    modeloRandomForest = RandomForestClassifier(random_state=0)
+    resultadoRandomForest = fit_and_predict("RandomForest", modeloRandomForest, treino_dados, treino_marcacoes)
+    resultados[resultadoRandomForest] = modeloRandomForest
+
+    modeloLogisticRegression = LogisticRegression(random_state = 0)
+    resultadoLogisticRegression = fit_and_predict("LogisticRegression", modeloLogisticRegression, treino_dados, treino_marcacoes)
+    resultados[resultadoLogisticRegression] = modeloLogisticRegression
+    
+
     #Verifica qual modelo teve a melhor perfomance
     maximo = max(resultados)
-    vencedor = resultados[maximo]
-    
-    print("Vencedor: " + str(vencedor)+"\n")
-    
-    #Aplica o modelo vencedor em um caso do mundo real, utilizando dados nunca vistos
-    '''
-    vencedor.fit(treino_dados, treino_marcacoes)
-    revalidacao_treino(vencedor, treino_dados, treino_marcacoes)
-    '''
-    teste_real(vencedor, validacao_dados, validacao_marcacoes)
+    return resultados[maximo] 
 
+def divide_dados(tweets, frases):
+    marcas = tweets['Sentimento']
+
+    X = frases
+    Y = marcas.values
+    
+    #Divisão de dados para treino e validação.
+    porcentagem_de_treino = 0.8
+    
+    tamanho_de_treino = int(porcentagem_de_treino * len(Y))
+    tamanho_de_validacao = len(Y) - tamanho_de_treino
+    
+    treino_dados = X[0:tamanho_de_treino]
+    treino_marcacoes = Y[0:tamanho_de_treino]
+    
+    validacao_dados = X[tamanho_de_treino:]
+    validacao_marcacoes = Y[tamanho_de_treino:]
+    
+    #treino_dados = pd.get_dummies(treino_dados).values
+    #validacao_dados = pd.get_dummies(validacao_dados).values
+    
+
+    return treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino
+
+def pre_processamento(dados):
+    #aplica a tokenização
+    textosTokenizados = [nltk.tokenize.word_tokenize(frase) for frase in dados]
+
+    #aplica as stop words, isto é, remove os pronomes e etc.
+    stopwords = nltk.corpus.stopwords.words('portuguese')
+    
+    #aplica steem, isto é, deixa a palavra na forma raiz
+    stemmer = nltk.stem.RSLPStemmer();
+    
+    dicionario = set()
+    for lista in textosTokenizados:
+        validas = [stemmer.stem(palavra) for palavra in lista if palavra not in stopwords and len(palavra) > 2]
+        dicionario.update(validas)
+    #print(dicionario)
+
+    totalDePalavras = len(dicionario)
+    #print(totalDePalavras)
+    #print(dicionario)
+    tuplas = zip(dicionario, range(totalDePalavras))
+    tradutor = {palavra: indice for palavra, indice in tuplas}
+
+    vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosTokenizados]
+
+    return vetoresDeTexto
+
+def pre_processamento_antigo(tweets, frases):
+    X = frases
+    Y = tweets['Sentimento']
+    
+    #Divisão de dados para treino, teste e validação.
+    porcentagem_de_treino = 0.8
+    
+    tamanho_de_treino = int(porcentagem_de_treino * len(Y))
+    tamanho_de_validacao = len(Y) - tamanho_de_treino
+    
+    treino_dados = X[0:tamanho_de_treino]
+    treino_marcacoes = Y[0:tamanho_de_treino]
+    
+    validacao_dados = X[tamanho_de_treino:]
+    validacao_marcacoes = Y[tamanho_de_treino:]
+
+    #aplica a tokenização e cria a back of words
+    textosQuebrados = [nltk.tokenize.word_tokenize(frase) for frase in X[0:tamanho_de_treino]]
+
+    #aplica as stop words, isto é, remove os pronomes e etc.
+    stopwords = nltk.corpus.stopwords.words('portuguese')
+    
+    #aplica steem, isto é, deixa a palavra na forma raiz
+    stemmer = nltk.stem.RSLPStemmer();
+    
+    dicionario = set()
+    for lista in textosQuebrados:
+        validas = [stemmer.stem(palavra) for palavra in lista if palavra not in stopwords and len(palavra) > 2]
+        dicionario.update(validas)
+    #print(dicionario)
+
+
+    totalDePalavras = len(dicionario)
+    #print(totalDePalavras)
+    #print(dicionario)
+    tuplas = zip(dicionario, range(totalDePalavras))
+    tradutor = {palavra: indice for palavra, indice in tuplas}
+
+
+    treino_dados = vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosQuebrados]
+    
+    return treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes
+
+def processar(tweets, frases):
+    #Descomente caso seja primeira vez de execução. Funcionalidaeds de processamento
+    #nltk.download('stopwords')
+    #nltk.download('rslp')
+    #nltk.download('punkt')
+
+    #treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes = pre_processamento_antigo(tweets, frases)
+    
+
+    treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino = divide_dados(tweets, frases)
+    
+    treino_dados = pre_processamento(treino_dados)
+    validacao_dados = pre_processamento(validacao_dados)
+
+    #Encontrando o modelo vencedor
+    vencedor = cria_modelos(treino_dados, treino_marcacoes)
+    print("Modelo vencedor: " + str(vencedor)+"\n")
+
+    #Validando o modelo com novos dados
+    vencedor.fit(treino_dados, treino_marcacoes)
+    #print(treino_dados)
+    #print(validacao_dados)
+
+    valida_dados(vencedor, validacao_dados, validacao_marcacoes)
+    
