@@ -25,12 +25,15 @@ def vetorizar_texto(texto, tradutor, stemmer):
     return vetor
 
 def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
+    '''
     k = 10
     scores = cross_val_score(modelo, treino_dados, treino_marcacoes, cv=k)
     taxa_de_acerto = np.mean(scores)
-    msg = "ETAPA TREINO - Taxa de acerto do {0}: {1}".format(nome, taxa_de_acerto)
-    print(msg)
-    return taxa_de_acerto
+    '''
+    resultado = modelo.fit(treino_dados, treino_marcacoes)
+    fit_and_predict_score = str(modelo.score(treino_dados, treino_marcacoes))
+    print("ETAPA TREINO - Acurácia: " + fit_and_predict_score)
+    return fit_and_predict_score
 
 def teste_real(modelo, validacao_dados, validacao_marcacoes):
     resultado = modelo.predict(validacao_dados)
@@ -138,7 +141,7 @@ def processar(tweets, frases):
     X = vetoresDeTexto
     Y = marcas
     
-    #Divisão de dados para treino, teste e validação.
+    #Divisão de dados para treino e validação.
     porcentagem_de_treino = 0.8
     
     tamanho_de_treino = int(porcentagem_de_treino * len(Y))
@@ -181,7 +184,9 @@ def processar(tweets, frases):
     print("Vencedor: " + str(vencedor)+"\n")
     
     #Aplica o modelo vencedor em um caso do mundo real, utilizando dados nunca vistos
+    '''
     vencedor.fit(treino_dados, treino_marcacoes)
     revalidacao_treino(vencedor, treino_dados, treino_marcacoes)
+    '''
     teste_real(vencedor, validacao_dados, validacao_marcacoes)
 
