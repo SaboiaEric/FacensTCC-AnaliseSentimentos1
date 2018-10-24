@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score
+from sklearn.feature_extraction.text import CountVectorizer
 from collections import Counter
 import matplotlib.pyplot as plt
 import itertools
@@ -162,6 +163,12 @@ def divide_dados(tweets, frases):
     
     validacao_dados = X[tamanho_de_treino:]
     validacao_marcacoes = Y[tamanho_de_treino:]
+
+    print('X dimensionality', treino_dados.shape)
+    print('y dimensionality', validacao_dados.shape)
+
+    print('X label', treino_marcacoes.shape)
+    print('y label', validacao_marcacoes.shape)
     
     #treino_dados = pd.get_dummies(treino_dados).values
     #validacao_dados = pd.get_dummies(validacao_dados).values
@@ -193,7 +200,28 @@ def pre_processamento(dados):
 
     vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosTokenizados]
 
+    return vetoresDeTexto, dicionario
+
+def pre_processamento_validacao(dados, dicionario):
+    #aplica a tokenização
+    textosTokenizados = [nltk.tokenize.word_tokenize(frase) for frase in dados]
+
+    #aplica as stop words, isto é, remove os pronomes e etc.
+    stopwords = nltk.corpus.stopwords.words('portuguese')
+    
+    #aplica steem, isto é, deixa a palavra na forma raiz
+    stemmer = nltk.stem.RSLPStemmer();
+    
+    totalDePalavras = len(dicionario)
+    #print(totalDePalavras)
+    #print(dicionario)
+    tuplas = zip(dicionario, range(totalDePalavras))
+    tradutor = {palavra: indice for palavra, indice in tuplas}
+
+    vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosTokenizados]
+
     return vetoresDeTexto
+
 
 def pre_processamento_antigo(tweets, frases):
     X = frases
@@ -246,11 +274,10 @@ def processar(tweets, frases):
 
     #treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes = pre_processamento_antigo(tweets, frases)
     
-
     treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino = divide_dados(tweets, frases)
     
-    treino_dados = pre_processamento(treino_dados)
-    validacao_dados = pre_processamento(validacao_dados)
+    treino_dados, dicionario = pre_processamento(treino_dados)
+    validacao_dados = pre_processamento_validacao(validacao_dados, dicionario)
 
     #Encontrando o modelo vencedor
     vencedor = cria_modelos(treino_dados, treino_marcacoes)
@@ -258,8 +285,5 @@ def processar(tweets, frases):
 
     #Validando o modelo com novos dados
     vencedor.fit(treino_dados, treino_marcacoes)
-    #print(treino_dados)
-    #print(validacao_dados)
-
     valida_dados(vencedor, validacao_dados, validacao_marcacoes)
     
