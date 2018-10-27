@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
 import matplotlib.pyplot as plt
 import itertools
@@ -29,11 +30,6 @@ def vetorizar_texto(texto, tradutor, stemmer):
     return vetor
 
 def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
-    '''
-    k = 10
-    scores = cross_val_score(modelo, treino_dados, treino_marcacoes, cv=k)
-    taxa_de_acerto = np.mean(scores)
-    '''
     resultado = modelo.fit(treino_dados, treino_marcacoes)
     fit_and_predict_score = str(modelo.score(treino_dados, treino_marcacoes))
     print("ETAPA TREINO "+ nome + "- Acurácia: " + fit_and_predict_score)
@@ -144,7 +140,7 @@ def cria_modelos(treino_dados, treino_marcacoes):
 
     #Verifica qual modelo teve a melhor perfomance
     maximo = max(resultados)
-    return resultados[maximo] 
+    return resultados[maximo], resultados
 
 def divide_dados(tweets, frases):
     marcas = tweets['Sentimento']
@@ -163,12 +159,6 @@ def divide_dados(tweets, frases):
     
     validacao_dados = X[tamanho_de_treino:]
     validacao_marcacoes = Y[tamanho_de_treino:]
-
-    print('X dimensionality', treino_dados.shape)
-    print('y dimensionality', validacao_dados.shape)
-
-    print('X label', treino_marcacoes.shape)
-    print('y label', validacao_marcacoes.shape)
     
     #treino_dados = pd.get_dummies(treino_dados).values
     #validacao_dados = pd.get_dummies(validacao_dados).values
@@ -222,7 +212,6 @@ def pre_processamento_validacao(dados, dicionario):
 
     return vetoresDeTexto
 
-
 def pre_processamento_antigo(tweets, frases):
     X = frases
     Y = tweets['Sentimento']
@@ -266,24 +255,78 @@ def pre_processamento_antigo(tweets, frases):
     
     return treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes
 
+def processamento_holdout(tweets, frases):
+    print("\n***************************\n")
+    print("PROCESSAMENTO - HOLDOUT")
+    print("\n***************************\n")
+    treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino = divide_dados(tweets, frases)
+
+    treino_dados, dicionario = pre_processamento(treino_dados)
+    validacao_dados = pre_processamento_validacao(validacao_dados, dicionario)
+
+    
+    #Encontrando o modelo vencedor
+    vencedor,resultados = cria_modelos(treino_dados, treino_marcacoes)
+    print("Modelo vencedor: " + str(vencedor)+"\n")
+
+    #Validando o modelo com novos dados
+    vencedor.fit(treino_dados, treino_marcacoes)
+    valida_dados(vencedor, validacao_dados, validacao_marcacoes) 
+
+    dados = np.concatenate((treino_dados, validacao_dados), axis=0)
+    marcacao = np.concatenate((treino_marcacoes, validacao_marcacoes), axis=0)
+    return dados, marcacao, resultados
+
+
+def processamento_kfold(dados, marcacao):
+    contador = 1
+    print("\n***************************\n")
+    print("PROCESSAMENTO - KFOLD")
+    print("\n***************************\n")
+    random_split = StratifiedShuffleSplit(marcacao, test_size=.25, random_state=0)
+    for train_index, test_index in random_split.split(dados, marcacao):
+        treino_dados, treino_marcacoes = dados[train_index], dados[test_index]
+        validacao_dados, validacao_marcacoes = marcacao[train_index], marcacao[test_index]
+        print("GRUPO: "+ str(contador))
+        
+        print(len(treino_dados))
+        print(len(treino_marcacoes))
+        print(len(validacao_dados))
+        print(len(validacao_marcacoes))
+
+        #Encontrando o modelo vencedor
+        vencedor, resultados = cria_modelos(treino_dados, treino_marcacoes)
+        print("Modelo vencedor: " + str(vencedor)+"\n")
+
+        #Validando o modelo com novos dados
+        vencedor.fit(treino_dados, treino_marcacoes)
+        valida_dados(vencedor, validacao_dados, validacao_marcacoes) 
+
+        contador+=1
+
+def processamento_kfold_2(dados, marcacao, resultados):
+    print("\n***************************\n")
+    print("PROCESSAMENTO - KFOLD")
+    print("\n***************************\n")
+    contador = 1
+    k = 5
+    for iterator in resultados:
+        print("GRUPO: "+ str(contador))
+        print("Nome: "+ str(resultados[iterator]))        
+        scores = cross_val_score(resultados[iterator], dados, marcacao, cv=k, scoring='f1')
+        taxa_de_acerto = np.mean(scores)
+        print("Taxa de acerto: " + str(taxa_de_acerto))
+        contador+=1
+
+
 def processar(tweets, frases):
     #Descomente caso seja primeira vez de execução. Funcionalidaeds de processamento
     #nltk.download('stopwords')
     #nltk.download('rslp')
     #nltk.download('punkt')
 
-    #treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes = pre_processamento_antigo(tweets, frases)
-    
-    treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino = divide_dados(tweets, frases)
-    
-    treino_dados, dicionario = pre_processamento(treino_dados)
-    validacao_dados = pre_processamento_validacao(validacao_dados, dicionario)
+    dados, marcacao, resultados = processamento_holdout(tweets, frases)
+    #processamento_kfold(dados, marcacao)
+    processamento_kfold_2(dados, marcacao, resultados)
 
-    #Encontrando o modelo vencedor
-    vencedor = cria_modelos(treino_dados, treino_marcacoes)
-    print("Modelo vencedor: " + str(vencedor)+"\n")
-
-    #Validando o modelo com novos dados
-    vencedor.fit(treino_dados, treino_marcacoes)
-    valida_dados(vencedor, validacao_dados, validacao_marcacoes)
     

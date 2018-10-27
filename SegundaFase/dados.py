@@ -23,3 +23,4 @@ tweets = pd.read_excel('DataSet_Bolsonaro.xlsx', sheet_name='DS-PN-ID', encoding
 frases = tweets['Text'].str.lower()
 print("Arquivo: DataSet_Bolsonaro.xlsx	-  Folha: DS-PN-ID")
 processar(tweets, frases)
+
