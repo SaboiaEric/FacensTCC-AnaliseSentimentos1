@@ -1,6 +1,7 @@
 from sklearn.model_selection import cross_val_score
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -33,6 +34,8 @@ def fit_and_predict(nome, modelo, treino_dados, treino_marcacoes):
     resultado = modelo.fit(treino_dados, treino_marcacoes)
     fit_and_predict_score = str(modelo.score(treino_dados, treino_marcacoes))
     print("ETAPA TREINO "+ nome + "- Acurácia: " + fit_and_predict_score)
+    print("Devio Padrão: " + str(np.std(treino_dados,  dtype=np.float64)))
+    print("==============================================================")
     return fit_and_predict_score
 
 def valida_dados(modelo, validacao_dados, validacao_marcacoes):
@@ -40,6 +43,7 @@ def valida_dados(modelo, validacao_dados, validacao_marcacoes):
     metricas(resultado,validacao_marcacoes)
 
 def metricas(resultado,validacao_marcacoes):
+    '''
     #Apresentação do report contendo precision, recall and F-measures
     if len(set(resultado)) > 2:
         target_names = ['negativo', 'positivo', 'neutro']
@@ -59,15 +63,18 @@ def metricas(resultado,validacao_marcacoes):
         matrix_confusao(validacao_marcacoes, resultado,target_names)
 
         print("Metrics\n")
-        print("F-score: " + str(f1_score(validacao_marcacoes, resultado)))
+        
         print("Precision: " + str(precision_score(validacao_marcacoes, resultado))) 
         print("Recall: " + str(recall_score(validacao_marcacoes, resultado))) 
         #Cria estatistica dos resultados.
-        taxa_de_acerto_base = max(Counter(validacao_marcacoes).values()) * 100 / len(validacao_marcacoes)
-        print("Taxa de acerto base: %f" % taxa_de_acerto_base)
+        '''
+
+    print("F-score: " + str(f1_score(validacao_marcacoes, resultado)))
+    taxa_de_acerto_base = max(Counter(validacao_marcacoes).values()) * 100 / len(validacao_marcacoes)
+    print("Taxa de acerto base: %f" % taxa_de_acerto_base)
 
     #Apresentação da accuracy e resultado final
-    print("Acurácia: " + str(accuracy_score(validacao_marcacoes, resultado)))
+    #print("Acurácia: " + str(accuracy_score(validacao_marcacoes, resultado)))
 
 def plot_confusion_matrix(cm, classes,normalize=False,title='Confusion matrix',cmap=plt.cm.Blues):
     if normalize:
@@ -136,6 +143,10 @@ def cria_modelos(treino_dados, treino_marcacoes):
     modeloLogisticRegression = LogisticRegression(random_state = 0)
     resultadoLogisticRegression = fit_and_predict("LogisticRegression", modeloLogisticRegression, treino_dados, treino_marcacoes)
     resultados[resultadoLogisticRegression] = modeloLogisticRegression
+
+    modeloSVC = SVC(random_state = 0)
+    resultadoSVC = fit_and_predict("SVC RBF Kernel", modeloSVC, treino_dados, treino_marcacoes)
+    resultados[resultadoSVC] = modeloSVC
     
 
     #Verifica qual modelo teve a melhor perfomance
@@ -167,24 +178,21 @@ def divide_dados(tweets, frases):
     return treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino
 
 def pre_processamento(dados):
-    #aplica a tokenização
+    
     textosTokenizados = [nltk.tokenize.word_tokenize(frase) for frase in dados]
 
-    #aplica as stop words, isto é, remove os pronomes e etc.
     stopwords = nltk.corpus.stopwords.words('portuguese')
     
-    #aplica steem, isto é, deixa a palavra na forma raiz
     stemmer = nltk.stem.RSLPStemmer();
     
     dicionario = set()
     for lista in textosTokenizados:
         validas = [stemmer.stem(palavra) for palavra in lista if palavra not in stopwords and len(palavra) > 2]
         dicionario.update(validas)
-    #print(dicionario)
+    
 
     totalDePalavras = len(dicionario)
-    #print(totalDePalavras)
-    #print(dicionario)
+    
     tuplas = zip(dicionario, range(totalDePalavras))
     tradutor = {palavra: indice for palavra, indice in tuplas}
 
@@ -256,9 +264,9 @@ def pre_processamento_antigo(tweets, frases):
     return treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes
 
 def processamento_holdout(tweets, frases):
-    print("\n***************************\n")
+    print("\n***************************")
     print("PROCESSAMENTO - HOLDOUT")
-    print("\n***************************\n")
+    print("***************************")
     treino_dados, treino_marcacoes, validacao_dados, validacao_marcacoes, tamanho_de_treino = divide_dados(tweets, frases)
 
     treino_dados, dicionario = pre_processamento(treino_dados)
@@ -277,12 +285,11 @@ def processamento_holdout(tweets, frases):
     marcacao = np.concatenate((treino_marcacoes, validacao_marcacoes), axis=0)
     return dados, marcacao, resultados
 
-
 def processamento_kfold(dados, marcacao):
     contador = 1
-    print("\n***************************\n")
+    print("\n***************************")
     print("PROCESSAMENTO - KFOLD")
-    print("\n***************************\n")
+    print("***************************\n")
     random_split = StratifiedShuffleSplit(marcacao, test_size=.25, random_state=0)
     for train_index, test_index in random_split.split(dados, marcacao):
         treino_dados, treino_marcacoes = dados[train_index], dados[test_index]
@@ -317,7 +324,6 @@ def processamento_kfold_2(dados, marcacao, resultados):
         taxa_de_acerto = np.mean(scores)
         print("Taxa de acerto: " + str(taxa_de_acerto))
         contador+=1
-
 
 def processar(tweets, frases):
     #Descomente caso seja primeira vez de execução. Funcionalidaeds de processamento
