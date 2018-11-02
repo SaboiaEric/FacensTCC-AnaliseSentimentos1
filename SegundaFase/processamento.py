@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
 import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_confusion_matrix
 import itertools
 import pandas as pd
 import numpy as np
@@ -43,7 +44,7 @@ def valida_dados(modelo, validacao_dados, validacao_marcacoes):
     metricas(resultado,validacao_marcacoes)
 
 def metricas(resultado,validacao_marcacoes):
-    '''
+    
     #Apresentação do report contendo precision, recall and F-measures
     if len(set(resultado)) > 2:
         target_names = ['negativo', 'positivo', 'neutro']
@@ -67,7 +68,7 @@ def metricas(resultado,validacao_marcacoes):
         print("Precision: " + str(precision_score(validacao_marcacoes, resultado))) 
         print("Recall: " + str(recall_score(validacao_marcacoes, resultado))) 
         #Cria estatistica dos resultados.
-        '''
+        
 
     print("F-score: " + str(f1_score(validacao_marcacoes, resultado)))
     taxa_de_acerto_base = max(Counter(validacao_marcacoes).values()) * 100 / len(validacao_marcacoes)
@@ -183,7 +184,7 @@ def pre_processamento(dados):
 
     stopwords = nltk.corpus.stopwords.words('portuguese')
     
-    stemmer = nltk.stem.RSLPStemmer();
+    stemmer = nltk.stem.RSLPStemmer();       
     
     dicionario = set()
     for lista in textosTokenizados:
@@ -197,7 +198,7 @@ def pre_processamento(dados):
     tradutor = {palavra: indice for palavra, indice in tuplas}
 
     vetoresDeTexto = [vetorizar_texto(texto, tradutor, stemmer) for texto in textosTokenizados]
-
+    #print(tradutor)
     return vetoresDeTexto, dicionario
 
 def pre_processamento_validacao(dados, dicionario):
@@ -272,7 +273,6 @@ def processamento_holdout(tweets, frases):
     treino_dados, dicionario = pre_processamento(treino_dados)
     validacao_dados = pre_processamento_validacao(validacao_dados, dicionario)
 
-    
     #Encontrando o modelo vencedor
     vencedor,resultados = cria_modelos(treino_dados, treino_marcacoes)
     print("Modelo vencedor: " + str(vencedor)+"\n")
